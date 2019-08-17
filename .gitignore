@@ -28,6 +28,5 @@ $*
 nbproject/
 
 # Generated things, may not be applicable to your project
-/coverage/
 /node_modules/
 npm-debug.log
