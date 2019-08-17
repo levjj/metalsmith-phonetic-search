@@ -130,7 +130,7 @@ function compareSearch(file, expected) {
 
 plugin = require("..");
 
-describe("metalsmith-simple-search", () => {
+describe("metalsmith-phonetic-search", () => {
     describe("options.destinationJson", () => {
         it("writes to 'search.json'", () => {
             return runPluginAsync().then((files) => {
@@ -170,18 +170,18 @@ describe("metalsmith-simple-search", () => {
         });
     });
     describe("options.destinationJs", () => {
-        it("includes 'simple-search.min.js'", () => {
+        it("includes 'search.min.js'", () => {
             return runPluginAsync().then((files) => {
-                expectSearchJs(files["simple-search.min.js"]);
+                expectSearchJs(files["search.min.js"]);
                 expect(files["search.js"]).not.toBeDefined();
             });
         });
         it("can write to another file", () => {
             return runPluginAsync({
-                destinationJs: "search.js"
+                destinationJs: "mysearch.js"
             }).then((files) => {
-                expectSearchJs(files["search.js"]);
-                expect(files["simple-search.min.js"]).not.toBeDefined();
+                expectSearchJs(files["mysearch.js"]);
+                expect(files["search.min.js"]).not.toBeDefined();
             });
         });
     });
@@ -264,11 +264,11 @@ describe("metalsmith-simple-search", () => {
         });
     });
     describe("options.skipSearchJs", () => {
-        it("skips writing 'simple-search.min.js'", () => {
+        it("skips writing 'search.min.js'", () => {
             return runPluginAsync({
                 skipSearchJs: true
             }).then((files) => {
-                expect(files["simple-search.min.js"]).not.toBeDefined();
+                expect(files["search.min.js"]).not.toBeDefined();
             });
         });
         it("can write to another file", () => {
@@ -276,7 +276,7 @@ describe("metalsmith-simple-search", () => {
                 destinationJs: "search.js"
             }).then((files) => {
                 expectSearchJs(files["search.js"]);
-                expect(files["simple-search.min.js"]).not.toBeDefined();
+                expect(files["search.min.js"]).not.toBeDefined();
             });
         });
     });
@@ -296,7 +296,7 @@ describe("metalsmith-simple-search", () => {
         });
     });
 });
-describe("metalsmithSimpleSearch.makeKeywords", () => {
+describe("metalsmithPhoneticSearch.makeKeywords", () => {
     it("condenses whitespace", () => {
         expect(plugin.makeKeywords("a     b")).toEqual("a b");
     });
@@ -313,7 +313,7 @@ describe("metalsmithSimpleSearch.makeKeywords", () => {
         expect(plugin.makeKeywords("one two one one two three one four")).toEqual("four one three two");
     });
 });
-describe("metalsmithSimpleSearch.stripHtml", () => {
+describe("metalsmithPhoneticSearch.stripHtml", () => {
     it("removes elements", () => {
         expect(plugin.stripHtml("<a href=\"test\">test link</a> here")).toEqual("test link here");
     });
@@ -321,7 +321,7 @@ describe("metalsmithSimpleSearch.stripHtml", () => {
         expect(plugin.stripHtml("&lt;div&gt;&quot;Hi&apos;")).toEqual("<div>\"Hi'");
     });
 });
-describe("metalsmithSimpleSearch.stripMarkdown", () => {
+describe("metalsmithPhoneticSearch.stripMarkdown", () => {
     it("removes link targets from within text", () => {
         expect(plugin.stripMarkdown("one [link1](http://example.com) here")).toEqual("one link1 here");
     });
