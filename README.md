@@ -28,7 +28,8 @@ Metadata properties are copied to the resulting JSON objects, optionally passing
                 },
                 "match": "**/*.{htm,html}",
                 "matchOptions": {},
-                "skipSearchJs": false
+                "skipSearchJs": false,
+                "includeJson": false
             }
         }
     }
@@ -70,6 +71,9 @@ This is how you would use it in JavaScript. Again, these are the defaults and do
         // When switching this on, make sure the "search.min.js" file
         // is somehow included in your build.
         skipSearchJs: false,
+
+        // If true, include JSON in call to showResults(...) in JavaScript.
+        includeJson: false,
 
         // Transform the filename into a URL for the search engine. The
         // result from this file is saved as the ".url" property in the
