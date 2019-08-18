@@ -101,4 +101,4 @@ Full API
 
 See [metalsmith-simple-search](https://github.com/connected-world-services/metalsmith-simple-search).
 
-This plugin is licensed under the [MIT License][LICENSE.md] with additional clauses. See the [full license text][LICENSE.md] for information.
+This plugin is licensed under the [MIT License](./LICENSE.md) with additional clauses. See the [full license text](./LICENSE.md) for information.
