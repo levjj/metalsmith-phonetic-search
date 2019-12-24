@@ -112,16 +112,44 @@ function metaphone(string) {
     return string.length > 0 ? string[0] + string.substr(1).replace(/[aeiou]/g, "") : "";
 }
 
-const params = new URLSearchParams(document.location.search.substring(1));
-const searchParam = params.get("q");
-document.getElementById("searchQuery").innerText = searchParam;
-const searchTokens = tokens(searchParam).map(t => metaphone(t)).filter(t => !!t);
+function metaphoneScore(title, query, queryTokens, queryMetaphoneTokens) {
+  let score = 0;
+  if (title.toLowerCase().includes(query.toLowerCase)) {
+    score += 100;
+  }
+  const titleTokens = tokens(title).filter(t => !!t);
+  for (const kw of titleTokens) {
+    if (queryTokens.includes(kw)) {
+      score += 20 + Math.floor(40 / titleTokens.length);
+    }
+  }
+  const titleMetaphoneTokens = tokens(query).map(t => metaphone(t)).filter(t => !!t);
+  for (const kw of titleMetaphoneTokens) {
+    if (queryMetaphoneTokens.includes(kw)) {
+      score += 5 + Math.floor(10 / titleMetaphoneTokens.length);
+    }
+  }
+  return score;
+}
 
-function showResults(searchData) {
+function compareWithQuery(query, queryTokens, queryMetaphoneTokens, searchData) {
+  return function(firstElement, secondElement) {
+    const firstElementTitle = searchData.entries[firstElement].title;
+    const firstElementScore = metaphoneScore(firstElementTitle, query, queryTokens, queryMetaphoneTokens);
+    const secondElementTitle = searchData.entries[secondElement].title;
+    const secondElementScore = metaphoneScore(secondElementTitle, query, queryTokens, queryMetaphoneTokens);
+    return firstElementScore < secondElementScore ? 1 : -1;
+  };
+}
+
+function showResultsForQuery(query, searchData) {
+  document.getElementById("searchQuery").innerText = query;
+  const queryTokens = tokens(query).filter(t => !!t);
+  const queryMetaphoneTokens = queryTokens.map(t => metaphone(t)).filter(t => !!t);
 
   const hits = new Set();
   for (const kw in searchData.index) {
-    for (const st of searchTokens) {
+    for (const st of queryMetaphoneTokens) {
       if (kw === st) {
         for (const hit of searchData.index[kw]) {
           hits.add(hit)
@@ -129,12 +157,17 @@ function showResults(searchData) {
       }
     }
   }
+  const sortedHits = [...hits.values()];
+  sortedHits.sort(compareWithQuery(query, queryTokens, queryMetaphoneTokens, searchData));
 
   const target = document.getElementById("searchResults");
+  while (target.firstChild) {
+    target.removeChild(target.firstChild);
+  }
   const numResults = document.createElement("p");
-  numResults.innerText = `${hits.size} results`;
+  numResults.innerText = `${sortedHits.length === 0 ? 'no' : sortedHits.length} results`;
   target.appendChild(numResults);
-  for (const hit of [...hits.values()].reverse()) {
+  for (const hit of sortedHits) {
     const details = searchData.entries[hit];
     const result = document.createElement("div");
     const resultHeader = document.createElement("h3");
@@ -148,4 +181,13 @@ function showResults(searchData) {
     result.appendChild(url);
     target.appendChild(result);
   }
+}
+
+function showResults(searchData) {
+  const params = new URLSearchParams(document.location.search.substring(1));
+  const searchParam = params.get("q");
+  showResultsForQuery(searchParam, searchData);
+  document.getElementById("q").addEventListener("input", evt => {
+    showResultsForQuery(evt.target.value, searchData);
+  });
 }
